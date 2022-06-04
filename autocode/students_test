@@ -23,12 +23,22 @@ func init() {
 func TestLen(t *testing.T) {
 	var people People
 
+	if people.Len() != 0 {
+		t.Errorf("Wrong People Len empty")
+	}
+
 	people = append(people, Person{})
 	people = append(people, Person{})
 	people = append(people, Person{})
 
 	if people.Len() != 3 {
-		t.Errorf("Wrong People Len")
+		t.Errorf("Wrong People Len 3")
+	}
+
+	people = people[0:1]
+
+	if people.Len() != 1 {
+		t.Errorf("Wrong People Len 1")
 	}
 }
 
@@ -39,6 +49,7 @@ func TestLess(t *testing.T) {
 	people = append(people, Person{"BBB", "BBB", now})
 	people = append(people, Person{"BBB", "BBB", now.Add(5 * time.Minute)})
 	people = append(people, Person{"AAA", "BBB", now})
+	people = append(people, Person{"AAA", "AAA", now})
 	people = append(people, Person{"AAA", "AAA", now})
 
 	if people.Less(0, 1) {
@@ -51,6 +62,10 @@ func TestLess(t *testing.T) {
 
 	if people.Less(2, 3) {
 		t.Errorf("Wrong People Less by LastName")
+	}
+
+	if people.Less(3, 4) {
+		t.Errorf("Wrong People Less Eq")
 	}
 }
 
