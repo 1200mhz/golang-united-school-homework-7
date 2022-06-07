@@ -1,7 +1,10 @@
 package coverage
 
 import (
+	"errors"
 	"os"
+	"reflect"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -87,17 +90,58 @@ func TestSwap(t *testing.T) {
 }
 
 func TestNew(t *testing.T) {
+	actual, err := New("---")
+	if actual != nil || !errors.Is(err, strconv.ErrSyntax) {
+		t.Errorf("Wrong String Error")
+	}
 
+	actual, err = New("1 1 \n 2")
+	if actual != nil || err.Error() != "Rows need to be the same length" {
+		t.Errorf("Wrong Matrix Error")
+	}
+
+	actual, err = New("1 1 \n 2 3")
+	expects := &Matrix{2, 2, []int{1, 1, 2, 3}}
+
+	if actual.cols != expects.cols || actual.rows != expects.rows || !reflect.DeepEqual(actual.data, expects.data) {
+		t.Errorf("Wrong Empty Matrix")
+	}
 }
 
 func TestRows(t *testing.T) {
+	matrix := &Matrix{2, 2, []int{4, 5, 6, 7}}
+	expects := [][]int{{4, 5}, {6, 7}}
 
+	actual := matrix.Rows()
+
+	if !reflect.DeepEqual(actual, expects) {
+		t.Errorf("Wrong Rows Matrix")
+	}
 }
 
 func TestCols(t *testing.T) {
+	matrix := &Matrix{3, 3, []int{1, 10, 100, 2, 20, 200, 3, 30, 300}}
+	expects := [][]int{{1, 2, 3}, {10, 20, 30}, {100, 200, 300}}
 
+	actual := matrix.Cols()
+
+	if !reflect.DeepEqual(actual, expects) {
+		t.Errorf("Wrong Cols Matrix")
+	}
 }
 
 func TestSet(t *testing.T) {
+	matrix := &Matrix{3, 3, []int{1, 10, 100, 2, 20, 200, 3, 30, 300}}
+	expectsData := []int{1, 10, 100, 2, 20, 200, 3, 30, 10000000}
 
+	actual := matrix.Set(2, 2, 10000000)
+
+	if !actual || !reflect.DeepEqual(matrix.data, expectsData) {
+		t.Errorf("Wrong Set Matrix")
+	}
+
+	actual = matrix.Set(-1, 2, 10000000)
+	if actual {
+		t.Errorf("Wrong Set Error")
+	}
 }
